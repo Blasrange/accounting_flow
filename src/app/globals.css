@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @keyframes spin-slow {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .animate-spin-slow {
+    animation: spin-slow 1.2s linear infinite;
+  }
+  :root {
+    --background: 240 10% 97%;
+    --foreground: 240 5% 35%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 5% 35%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 5% 35%;
+    --primary: 213 49% 57%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 5% 30%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 5% 55%;
+    --accent: 240 5% 92%;
+    --accent-foreground: 240 5% 25%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5% 91%;
+    --input: 240 5% 91%;
+    --ring: 213 49% 57%;
+    --radius: 0.5rem;
+
+    --sidebar-background: 240 5% 12%;
+    --sidebar-foreground: 240 5% 80%;
+    --sidebar-border: 240 5% 20%;
+    --sidebar-accent: 240 5% 22%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-primary: 213 49% 57%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-ring: 213 49% 67%;
+  }
+
+  .dark {
+    --background: 240 5% 12%;
+    --foreground: 240 5% 80%;
+    --card: 240 5% 16%;
+    --card-foreground: 240 5% 80%;
+    --popover: 240 5% 16%;
+    --popover-foreground: 240 5% 80%;
+    --primary: 213 49% 62%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 24%;
+    --secondary-foreground: 240 5% 90%;
+    --muted: 240 5% 24%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 240 5% 28%;
+    --accent-foreground: 240 5% 95%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 5% 24%;
+    --input: 240 5% 24%;
+    --ring: 213 49% 67%;
+    
+    --sidebar-background: 240 5% 12%;
+    --sidebar-foreground: 240 5% 80%;
+    --sidebar-border: 240 5% 20%;
+    --sidebar-accent: 240 5% 22%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-primary: 213 49% 57%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-ring: 213 49% 67%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

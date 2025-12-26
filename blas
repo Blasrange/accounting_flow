@@ -1,0 +1,69 @@
+CREATE TABLE users (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL UNIQUE,
+  password VARCHAR(255),
+  role ENUM('Administrator', 'Auditor') NOT NULL,
+  status ENUM('Active', 'Inactive') NOT NULL,
+  created_at DATETIME NOT NULL
+);
+
+-- Tabla principal de facturas
+CREATE TABLE invoices (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  invoice_number VARCHAR(50) NOT NULL UNIQUE,
+  delivery_number VARCHAR(50),
+  internal_order_number VARCHAR(50),
+  purchase_order_number VARCHAR(50),
+  invoice_date DATE NOT NULL,
+  invoice_due_date DATE NOT NULL,
+  customer_code VARCHAR(50) NOT NULL,
+  customer_tax_id VARCHAR(50) NOT NULL,
+  customer_name VARCHAR(100) NOT NULL,
+  customer_phone VARCHAR(30),
+  customer_address VARCHAR(255) NOT NULL,
+  customer_city VARCHAR(100) NOT NULL,
+  customer_state VARCHAR(100),
+  zip_code VARCHAR(20) NOT NULL,
+  invoice_total DECIMAL(18,2) NOT NULL,
+  vat_tax_amount DECIMAL(18,2) NOT NULL,
+  total_discount DECIMAL(18,2) NOT NULL,
+  amount_due DECIMAL(18,2) NOT NULL,
+  payment_method VARCHAR(100) NOT NULL,
+  status ENUM('Complete', 'Incomplete', 'Pending', 'Cancelled', 'Expired', 'Redispatch') NOT NULL, 
+  rejection_cause_code ENUM('OE','TI','WC','DU','RO','FQ','CB','WH','CH','SC') DEFAULT NULL,
+  invoice_file_url VARCHAR(255),
+  voucher_file_url VARCHAR(255),
+  voucher_number VARCHAR(100),
+  voucher_amount DECIMAL(12,2),
+  notes TEXT,
+  total_lines INT NOT NULL,
+  total_units INT NOT NULL,
+  created_at DATETIME NOT NULL,
+  updated_at DATETIME
+);
+
+-- Detalle de productos de la factura
+CREATE TABLE invoice_details (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  invoice_id INT NOT NULL,
+  sku VARCHAR(50) NOT NULL,
+  product_name VARCHAR(100) NOT NULL,
+  unit_of_measure VARCHAR(20) NOT NULL,
+  quantity INT NOT NULL,
+  batch_number VARCHAR(50),
+  serial_number VARCHAR(50),
+  unit_price DECIMAL(18,2) NOT NULL,
+  vat_tax_amount DECIMAL(18,2) NOT NULL,
+  unit_discount_amount DECIMAL(18,2) NOT NULL,
+  net_amount DECIMAL(18,2) NOT NULL,
+  weight DECIMAL(12,2),
+  length DECIMAL(12,2),
+  height DECIMAL(12,2),
+  width DECIMAL(12,2),
+  received_units INT DEFAULT NULL,
+  novelty  VARCHAR(100),
+  received_value DECIMAL(15,2) DEFAULT NULL,
+  returned_value DECIMAL(15,2) DEFAULT NULL,
+  FOREIGN KEY (invoice_id) REFERENCES invoices(id)
+);

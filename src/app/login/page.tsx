@@ -33,7 +33,7 @@ export default function LoginPage() {
               Corporación Colombiana de Logística
             </h2>
             <p className="text-white text-base drop-shadow-lg">
-              Conectando el futuro de la logística en Colombia
+              Gestión integral de legalización de facturas y manejo de devoluciones de productos.
             </p>
           </div>
         </div>

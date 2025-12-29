@@ -130,6 +130,7 @@ export async function GET() {
           novelty: d.novelty ?? 0,
           receivedValue: Number(d.received_value) || 0,
           returnedValue: Number(d.returned_value) || 0,
+          rejection_cause_code_line: d.rejection_cause_code_line ?? "SC",
         })),
     }));
 
@@ -257,8 +258,9 @@ export async function POST(request: Request) {
             weight,
             length,
             height,
-            width
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            width,
+            rejection_cause_code_line
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           `,
           [
             result.insertId,
@@ -276,6 +278,7 @@ export async function POST(request: Request) {
             d.length,
             d.height,
             d.width,
+            d.rejection_cause_code_line ?? "SC",
           ]
         );
       }
@@ -300,6 +303,38 @@ export async function PATCH(request: Request) {
 
   try {
     const data = await request.json();
+
+    /* ======================================================
+       🔥 NUEVO: PATCH SOLO CAUSAL DE DETALLE
+       ====================================================== */
+    if (data.detail_id && "rejection_cause_code_line" in data) {
+      connection = await getConnection();
+
+      const [result] = await connection.execute<ResultSetHeader>(
+        `
+        UPDATE invoice_details
+        SET rejection_cause_code_line = ?
+        WHERE id = ?
+        `,
+        [data.rejection_cause_code_line ?? null, data.detail_id]
+      );
+
+      if (result.affectedRows === 0) {
+        return NextResponse.json(
+          { message: "Detalle no encontrado" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "Causal del detalle actualizada correctamente",
+      });
+    }
+
+    /* ======================================================
+       ⬇️ TODO LO DEMÁS QUEDA IGUAL
+       ====================================================== */
 
     if (!data.id) {
       return NextResponse.json(
@@ -442,7 +477,8 @@ export async function PATCH(request: Request) {
             unit_price = ?,
             vat_tax_amount = ?,
             unit_discount_amount = ?,
-            net_amount = ?
+            net_amount = ?,
+            rejection_cause_code_line = COALESCE(?, rejection_cause_code_line)
           WHERE id = ?`,
           [
             payloadQuantity,
@@ -454,6 +490,7 @@ export async function PATCH(request: Request) {
             vatTaxAmount,
             unitDiscountAmount,
             netAmount,
+            d.rejection_cause_code_line ?? null,
             d.id,
           ]
         );

@@ -56,6 +56,7 @@ export async function GET(req: Request) {
         d.net_amount,
         d.received_units,
         d.novelty,
+        d.rejection_cause_code_line,
         d.received_value,
         d.returned_value
 

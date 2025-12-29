@@ -418,6 +418,8 @@ export function FacturasDashboard({ initialInvoices }: FacturasDashboardProps) {
                 length: Number(row["LENGTH"] || 0),
                 height: Number(row["HEIGHT"] || 0),
                 width: Number(row["WIDTH"] || 0),
+                rejection_cause_code_line:
+                  row["REJECTION_CAUSE_CODE_LINE"] || "SC",
               };
               invoicesMap[invoiceNumber].details.push(detail);
             } catch (error: any) {
@@ -425,9 +427,28 @@ export function FacturasDashboard({ initialInvoices }: FacturasDashboardProps) {
             }
           });
 
+          // Validar que cada factura tenga al menos un detalle
+          Object.values(invoicesMap).forEach((invoice, idx) => {
+            if (!invoice.details || invoice.details.length === 0) {
+              errors.push({
+                row:
+                  headersData.findIndex(
+                    (r) =>
+                      r["INVOICE_NUMBER"]?.toString() === invoice.invoiceNumber
+                  ) + 2,
+                error: `La factura #${invoice.invoiceNumber} no tiene detalles asociados y no se cargó.`,
+                data: invoice,
+              });
+              // Marcar para no guardar
+              (invoice as any).__skip = true;
+            }
+          });
+
           // Guardar cada factura en la base de datos usando la API
           for (const invoice of Object.values(invoicesMap)) {
             try {
+              // Saltar si no tiene detalles
+              if ((invoice as any).__skip) continue;
               // Verificar si ya existe una factura con el mismo número
               const existe = invoices.some(
                 (inv) => inv.invoiceNumber === invoice.invoiceNumber
@@ -463,12 +484,16 @@ export function FacturasDashboard({ initialInvoices }: FacturasDashboardProps) {
           const invoicesActualizadas = await res.json();
           setInvoices(invoicesActualizadas);
 
-          // Solo cuenta como éxito las facturas realmente insertadas (no duplicadas)
+          // Solo cuenta como éxito las facturas realmente insertadas (no duplicadas ni sin detalles)
           const totalIntentos = Object.keys(invoicesMap).length;
           const facturasDuplicadas = errors.filter((e) =>
             e.error.includes("Factura duplicada")
           ).length;
-          const successCount = totalIntentos - facturasDuplicadas;
+          const facturasSinDetalles = errors.filter((e) =>
+            e.error.includes("no tiene detalles asociados")
+          ).length;
+          const successCount =
+            totalIntentos - facturasDuplicadas - facturasSinDetalles;
 
           resolve({
             successCount,
@@ -783,14 +808,16 @@ export function FacturasDashboard({ initialInvoices }: FacturasDashboardProps) {
                                 toast({
                                   title: "Factura cancelada",
                                   description: `La factura #${invoice.invoiceNumber} ha sido cancelada.`,
-                                  variant: "destructive",
+                                  className:
+                                    "bg-green-100 text-green-800 border-green-300",
                                 });
                               } catch (error) {
                                 toast({
                                   title: "Error",
                                   description:
                                     "No se pudo cancelar la factura.",
-                                  variant: "destructive",
+                                  className:
+                                    "bg-red-100 text-red-800 border-red-300",
                                 });
                               }
                             }}

@@ -16,6 +16,18 @@ export type InvoiceDetail = {
   width?: number;
   receivedUnits?: number; // Unidades recibidas
   novelty?: number; // Novedad (diferencia)
+  rejection_cause_code_line?:
+    | "OE" // No Solicitado
+    | "TI" // Avería en Transporte
+    | "WC" // Error en Cliente
+    | "DU" // Duplicado
+    | "RO" // Cobro a Transportadora
+    | "FQ" // Avería Calidad
+    | "CB" // Sin Dinero
+    | "WH" // Faltante
+    | "CH" // Fecha Corta
+    | "SC" // Sin Novedad
+    | ""; // Sin Novedad Seleccionada
   receivedValue?: number; // Valor recibido
   returnedValue?: number; // Valor devuelto
 };
@@ -64,8 +76,8 @@ export type Invoice = {
     | "CB" // Sin Dinero
     | "WH" // Faltante
     | "CH" // Fecha Corta
-    | "SC" // Sin Causal
-    | ""; // Sin Causal Seleccionada
+    | "SC" // Sin Novedad
+    | ""; // Sin Novedad Seleccionada
   invoiceFileUrl?: string;
   voucherFileUrl?: string;
   voucherNumber?: string;

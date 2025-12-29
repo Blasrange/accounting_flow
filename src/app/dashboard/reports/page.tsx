@@ -17,14 +17,17 @@ function formatLocalDate(date: Date) {
 function buildUrl(base: string, range?: DateRange) {
   let url = base;
   if (range?.from) url += `?from=${formatLocalDate(range.from)}`;
-  if (range?.to) url += `${url.includes("?") ? "&" : "?"}to=${formatLocalDate(range.to)}`;
+  if (range?.to)
+    url += `${url.includes("?") ? "&" : "?"}to=${formatLocalDate(range.to)}`;
   return url;
 }
 
 function getDetalle(range?: DateRange) {
   if (!range) return "";
   if (range.type === "month") {
-    const mes = (range.from?.toLocaleString("es-ES", { month: "long" }) || "").replace(/^./, m => m.toUpperCase());
+    const mes = (
+      range.from?.toLocaleString("es-ES", { month: "long" }) || ""
+    ).replace(/^./, (m) => m.toUpperCase());
     const from = range.from ? range.from.toLocaleDateString("es-ES") : "";
     const to = range.to ? range.to.toLocaleDateString("es-ES") : "";
     return `Mes de ${mes} ${range.from?.getFullYear()} (${from} al ${to})`;
@@ -60,12 +63,29 @@ const rejection_cause_codeMap = {
   CB: "CB - Sin dinero",
   WH: "WH - Faltante",
   CH: "CH - Fecha corta",
-  SC: "SC - Sin Causal",
+  SC: "SC - Sin Novedad",
+};
+
+const rejection_cause_codelineMap = {
+  OE: "OE - No solicitado",
+  TI: "TI - Avería en transporte",
+  WC: "WC- Error en cliente",
+  DU: "DU - Duplicado",
+  RO: "RO - Cobro a transportadora",
+  FQ: "FQ - Avería calidad ",
+  CB: "CB - Sin dinero",
+  WH: "WH - Faltante",
+  CH: "CH - Fecha corta",
+  SC: "SC - Sin Novedad",
 };
 
 const toCOP = (v: number) =>
   typeof v === "number"
-    ? v.toLocaleString("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0 })
+    ? v.toLocaleString("es-CO", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
+      })
     : v;
 
 // Handlers
@@ -83,7 +103,9 @@ export default function ReportesPage() {
         let msg = `No hay información para el rango seleccionado.`;
         if (range?.type) msg += `\nTipo de selección: ${range.type}`;
         if (range?.from && range?.to) {
-          msg += `\nDesde: ${range.from.toLocaleDateString("es-ES")} Hasta: ${range.to.toLocaleDateString("es-ES")}`;
+          msg += `\nDesde: ${range.from.toLocaleDateString(
+            "es-ES"
+          )} Hasta: ${range.to.toLocaleDateString("es-ES")}`;
         }
         toast({
           title: "Sin datos para el rango seleccionado",
@@ -95,7 +117,9 @@ export default function ReportesPage() {
 
       const data = json.data.map((f: any) => ({
         "# Factura": f.invoice_number,
-        Fecha: f.invoice_date ? new Date(f.invoice_date).toLocaleDateString("es-CO") : "",
+        Fecha: f.invoice_date
+          ? new Date(f.invoice_date).toLocaleDateString("es-CO")
+          : "",
         Cliente: f.customer_name,
         NIT: f.customer_tax_id,
         Ciudad: f.customer_city,
@@ -103,8 +127,13 @@ export default function ReportesPage() {
         "Valor Neto": toCOP(f.amount_due),
         "Método de Pago": f.payment_method,
         Estado: statusMap[f.status as keyof typeof statusMap] || f.status,
-        "Código Causa Rechazo": rejection_cause_codeMap[f.rejection_cause_code as keyof typeof rejection_cause_codeMap] || f.rejection_cause_code,
-        Creada: f.created_at ? new Date(f.created_at).toLocaleDateString("es-CO") : "",
+        "Código Causa Rechazo":
+          rejection_cause_codeMap[
+            f.rejection_cause_code as keyof typeof rejection_cause_codeMap
+          ] || f.rejection_cause_code,
+        Creada: f.created_at
+          ? new Date(f.created_at).toLocaleDateString("es-CO")
+          : "",
         Peso: f.total_weight,
         "Unidades Despachadas": f.total_units_despachadas,
         "Unidades con Novedad": f.total_units_con_novedad,
@@ -118,14 +147,17 @@ export default function ReportesPage() {
       exportToExcel(data, "Resumen de Recaudos", "UIAF");
       toast({
         title: "Reporte descargado",
-        description: `${getDetalle(range) ? getDetalle(range) + "\n" : ""}Archivo: Resumen de Recaudos_UIAF.xlsx`,
+        description: `${
+          getDetalle(range) ? getDetalle(range) + "\n" : ""
+        }Archivo: Resumen de Recaudos_UIAF.xlsx`,
         className: "bg-green-100 text-green-800 border-green-300",
       });
     } catch (e) {
       console.error(e);
       toast({
         title: "Error generando reporte UIAF",
-        description: "Ocurrió un problema al generar o descargar el reporte. Intenta nuevamente.",
+        description:
+          "Ocurrió un problema al generar o descargar el reporte. Intenta nuevamente.",
         className: "bg-red-100 text-red-800 border-red-300",
       });
     }
@@ -142,7 +174,9 @@ export default function ReportesPage() {
         let msg = `No hay información para el rango seleccionado.`;
         if (range?.type) msg += `\nTipo de selección: ${range.type}`;
         if (range?.from && range?.to) {
-          msg += `\nDesde: ${range.from.toLocaleDateString("es-ES")} Hasta: ${range.to.toLocaleDateString("es-ES")}`;
+          msg += `\nDesde: ${range.from.toLocaleDateString(
+            "es-ES"
+          )} Hasta: ${range.to.toLocaleDateString("es-ES")}`;
         }
         toast({
           title: "Sin datos para el rango seleccionado",
@@ -154,12 +188,14 @@ export default function ReportesPage() {
 
       const data = json.data.map((f: any) => ({
         "# Factura": f.invoice_number,
-        Fecha: f.invoice_date ? new Date(f.invoice_date).toLocaleDateString("es-CO") : "",
+        Fecha: f.invoice_date
+          ? new Date(f.invoice_date).toLocaleDateString("es-CO")
+          : "",
         Cliente: f.customer_name,
         NIT: f.customer_tax_id,
         Ciudad: f.customer_city,
+        "Material / SKU": f.sku,
         Producto: f.product_name,
-        SKU: f.sku,
         "U.Medida": f.unit_of_measure,
         Cantidad: f.quantity,
         "Precio Unitario": f.unit_price,
@@ -174,21 +210,33 @@ export default function ReportesPage() {
         "Valor Comprobante": f.voucher_amount,
         "Método de Pago": f.payment_method,
         Estado: statusMap[f.status as keyof typeof statusMap] || f.status,
-        "Código Causa Rechazo": rejection_cause_codeMap[f.rejection_cause_code as keyof typeof rejection_cause_codeMap] || f.rejection_cause_code,
-        Creada: f.created_at ? new Date(f.created_at).toLocaleDateString("es-CO") : "",
+        "Causa Rechazo Factura":
+          rejection_cause_codeMap[
+            f.rejection_cause_code as keyof typeof rejection_cause_codeMap
+          ] || f.rejection_cause_code,
+        "Causa Rechazo Líneas":
+          rejection_cause_codelineMap[
+            f.rejection_cause_code_line as keyof typeof rejection_cause_codelineMap
+          ] || f.rejection_cause_code_line,
+        Creada: f.created_at
+          ? new Date(f.created_at).toLocaleDateString("es-CO")
+          : "",
       }));
 
       exportToExcel(data, "Reporte Facturas por Líneas", "Facturas_Lineas");
       toast({
         title: "Reporte descargado",
-        description: `${getDetalle(range) ? getDetalle(range) + "\n" : ""}Archivo: Reporte Facturas por Líneas_Facturas_Lineas.xlsx`,
+        description: `${
+          getDetalle(range) ? getDetalle(range) + "\n" : ""
+        }Archivo: Reporte Facturas por Líneas_Facturas_Lineas.xlsx`,
         className: "bg-green-100 text-green-800 border-green-300",
       });
     } catch (e) {
       console.error(e);
       toast({
         title: "Error generando reporte de líneas",
-        description: "Ocurrió un problema al generar o descargar el reporte. Intenta nuevamente.",
+        description:
+          "Ocurrió un problema al generar o descargar el reporte. Intenta nuevamente.",
         className: "bg-red-100 text-red-800 border-red-300",
       });
     }
@@ -205,7 +253,9 @@ export default function ReportesPage() {
         let msg = `No hay información para el rango seleccionado.`;
         if (range?.type) msg += `\nTipo de selección: ${range.type}`;
         if (range?.from && range?.to) {
-          msg += `\nDesde: ${range.from.toLocaleDateString("es-ES")} Hasta: ${range.to.toLocaleDateString("es-ES")}`;
+          msg += `\nDesde: ${range.from.toLocaleDateString(
+            "es-ES"
+          )} Hasta: ${range.to.toLocaleDateString("es-ES")}`;
         }
         toast({
           title: "Sin datos para el rango seleccionado",
@@ -249,21 +299,25 @@ export default function ReportesPage() {
       exportToExcel(data, "Reporte_WMS", "WMS", "xls");
       toast({
         title: "Reporte descargado",
-        description: `${getDetalle(range) ? getDetalle(range) + "\n" : ""}Archivo: Reporte_WMS_WMS.xls`,
+        description: `${
+          getDetalle(range) ? getDetalle(range) + "\n" : ""
+        }Archivo: Reporte_WMS_WMS.xls`,
         className: "bg-green-100 text-green-800 border-green-300",
       });
     } catch (e) {
       console.error(e);
       toast({
         title: "Error generando reporte WMS",
-        description: "Ocurrió un problema al generar o descargar el reporte. Intenta nuevamente.",
+        description:
+          "Ocurrió un problema al generar o descargar el reporte. Intenta nuevamente.",
         className: "bg-red-100 text-red-800 border-red-300",
       });
     }
   }
 
   const handleTarifas = () => alert("Generar reporte Tarifas (pendiente)");
-  const handleOrdenes = () => alert("Generar reporte Órdenes de cargue (pendiente)");
+  const handleOrdenes = () =>
+    alert("Generar reporte Órdenes de cargue (pendiente)");
 
   return (
     <div className="p-6">

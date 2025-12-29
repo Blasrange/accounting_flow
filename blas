@@ -63,6 +63,7 @@ CREATE TABLE invoice_details (
   width DECIMAL(12,2),
   received_units INT DEFAULT NULL,
   novelty  VARCHAR(100),
+  rejection_cause_code_line ENUM('OE','TI','WC','DU','RO','FQ','CB','WH','CH','SC') DEFAULT NULL,
   received_value DECIMAL(15,2) DEFAULT NULL,
   returned_value DECIMAL(15,2) DEFAULT NULL,
   FOREIGN KEY (invoice_id) REFERENCES invoices(id)

@@ -167,7 +167,9 @@ export function UploadDialog({
           <p className="text-lg font-bold text-destructive">
             Error al Procesar
           </p>
-          <p className="text-sm text-destructive/80">{processingError}</p>
+          <p className="text-sm font-semibold text-red-600 dark:text-red-400">
+            {processingError}
+          </p>
         </div>
       );
     }
@@ -226,16 +228,106 @@ export function UploadDialog({
                                 <table className="min-w-full text-xs border border-gray-200 rounded">
                                   <tbody>
                                     {Object.entries(err.data).map(
-                                      ([key, value]) => (
-                                        <tr key={key}>
-                                          <td className="font-semibold px-2 py-1 border-b border-r border-gray-100 bg-gray-50 text-gray-700">
-                                            {key}
-                                          </td>
-                                          <td className="px-2 py-1 border-b border-gray-100">
-                                            {String(value)}
-                                          </td>
-                                        </tr>
-                                      )
+                                      ([key, value]) => {
+                                        // Oculta la fila si la clave es 'details' y el valor es un array de objetos
+                                        if (
+                                          key === "details" &&
+                                          Array.isArray(value) &&
+                                          value.length > 0 &&
+                                          typeof value[0] === "object"
+                                        ) {
+                                          return (
+                                            <tr key={key}>
+                                              <td
+                                                colSpan={2}
+                                                className="p-0 align-top"
+                                                style={{
+                                                  border: "none",
+                                                  padding: 0,
+                                                }}
+                                              >
+                                                <div className="flex flex-col gap-4 w-full">
+                                                  {value.map(
+                                                    (
+                                                      item: any,
+                                                      idx: number
+                                                    ) => (
+                                                      <table
+                                                        key={idx}
+                                                        className="min-w-full text-xs border border-gray-200 rounded mb-2 ml-0"
+                                                        style={{
+                                                          marginLeft: 0,
+                                                        }}
+                                                      >
+                                                        <thead>
+                                                          <tr>
+                                                            <th
+                                                              colSpan={2}
+                                                              className="px-2 py-1 border-b border-gray-100 bg-gray-50 text-gray-700 font-semibold text-left"
+                                                            >
+                                                              Detalle {idx + 1}
+                                                            </th>
+                                                          </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                          {Object.entries(
+                                                            item
+                                                          ).map(
+                                                            ([field, val]) => (
+                                                              <tr key={field}>
+                                                                <td className="font-semibold px-2 py-1 border-b border-r border-gray-100 bg-gray-50 text-gray-700 w-32">
+                                                                  {field}
+                                                                </td>
+                                                                <td className="px-2 py-1 border-b border-gray-100">
+                                                                  {typeof val ===
+                                                                    "object" &&
+                                                                  val !== null
+                                                                    ? JSON.stringify(
+                                                                        val
+                                                                      )
+                                                                    : String(
+                                                                        val
+                                                                      )}
+                                                                </td>
+                                                              </tr>
+                                                            )
+                                                          )}
+                                                        </tbody>
+                                                      </table>
+                                                    )
+                                                  )}
+                                                </div>
+                                              </td>
+                                            </tr>
+                                          );
+                                        }
+                                        // Renderiza normalmente para otras claves
+                                        return (
+                                          <tr key={key}>
+                                            <td className="font-semibold px-2 py-1 border-b border-r border-gray-100 bg-gray-50 text-gray-700">
+                                              {key}
+                                            </td>
+                                            <td className="px-2 py-1 border-b border-gray-100">
+                                              {Array.isArray(value) ? (
+                                                <span>
+                                                  {JSON.stringify(value)}
+                                                </span>
+                                              ) : typeof value === "object" &&
+                                                value !== null ? (
+                                                <pre className="whitespace-pre-wrap text-xs bg-gray-50 p-2 rounded border border-gray-100">
+                                                  {JSON.stringify(
+                                                    value,
+                                                    null,
+                                                    2
+                                                  )}
+                                                </pre>
+                                              ) : (
+                                                String(value)
+                                              )}
+                                            </td>
+                                          </tr>
+                                        );
+                                      }
                                     )}
                                   </tbody>
                                 </table>

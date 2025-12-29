@@ -97,8 +97,16 @@ export function EditDespachoDialog({
 
   useEffect(() => {
     if (invoice) {
+      // voucherDate debe venir en formato yyyy-MM-dd desde el backend
+      let voucherDate = invoice.voucherDate || "";
+      // Si viene en formato dd/MM/yyyy, lo convertimos a yyyy-MM-dd
+      if (voucherDate.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        const [dd, mm, yyyy] = voucherDate.split("/");
+        voucherDate = `${yyyy}-${mm}-${dd}`;
+      }
       reset({
         ...invoice,
+        voucherDate,
         status: invoice.status || "",
         rejection_cause_code: invoice.rejection_cause_code ?? "SC",
       });
@@ -803,7 +811,8 @@ export function EditDespachoDialog({
                                   >
                                     <span className="sr-only">Ver causal</span>
                                     {(() => {
-                                      const code = detail.rejection_cause_code_line;
+                                      const code =
+                                        detail.rejection_cause_code_line;
                                       const colorMap: Record<string, string> = {
                                         SC: "text-gray-400",
                                         OE: "text-red-500",
@@ -841,7 +850,8 @@ export function EditDespachoDialog({
                                   >
                                     {(() => {
                                       const code =
-                                        detail.rejection_cause_code_line || "SC";
+                                        detail.rejection_cause_code_line ||
+                                        "SC";
                                       const causalesMap: Record<
                                         string,
                                         string
@@ -882,19 +892,20 @@ export function EditDespachoDialog({
                                             // Actualizar estado local del detalle al seleccionar causal
                                             updateDetail(idx, {
                                               ...detail,
-                                              rejection_cause_code_line: value as
-                                                | ""
-                                                | "OE"
-                                                | "TI"
-                                                | "WC"
-                                                | "DU"
-                                                | "RO"
-                                                | "FQ"
-                                                | "CB"
-                                                | "WH"
-                                                | "CH"
-                                                | "SC"
-                                                | undefined,
+                                              rejection_cause_code_line:
+                                                value as
+                                                  | ""
+                                                  | "OE"
+                                                  | "TI"
+                                                  | "WC"
+                                                  | "DU"
+                                                  | "RO"
+                                                  | "FQ"
+                                                  | "CB"
+                                                  | "WH"
+                                                  | "CH"
+                                                  | "SC"
+                                                  | undefined,
                                             });
                                             setShowCausalModalId(null);
                                           }}
@@ -1119,10 +1130,10 @@ export function EditDespachoDialog({
                           </div>
                         )}
                         <div className="space-y-1 pt-1">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             <div className="space-y-1">
                               <Label htmlFor="voucher-number">
-                                Número de Comprobante
+                                Número Voucher
                               </Label>
                               <div className="relative">
                                 <FileText className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -1150,6 +1161,19 @@ export function EditDespachoDialog({
                                   {...register("voucherAmount", {
                                     valueAsNumber: true,
                                   })}
+                                />
+                              </div>
+                            </div>
+                            <div className="space-y-1">
+                              <Label htmlFor="voucher-date">
+                                Fecha de Pago
+                              </Label>
+                              <div className="relative">
+                                <Input
+                                  id="voucher-date"
+                                  type="date"
+                                  className="h-9 text-sm font-medium pl-4"
+                                  {...register("voucherDate")}
                                 />
                               </div>
                             </div>

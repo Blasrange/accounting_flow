@@ -82,6 +82,12 @@ export type Invoice = {
   voucherFileUrl?: string;
   voucherNumber?: string;
   voucherAmount?: number;
+  voucherDate?: string; // Puede ser dd/MM/yyyy (para mostrar) o yyyy-MM-dd (para el input tipo date)
+  /**
+   * voucherDateRaw: formato yyyy-MM-dd, solo se usa para inicializar el input tipo date en el formulario.
+   * Este campo lo agrega el backend en la respuesta PATCH y GET, pero no es obligatorio en todos los flujos.
+   */
+  voucherDateRaw?: string;
   notes?: string;
   totalLines: number;
   totalUnits: number;

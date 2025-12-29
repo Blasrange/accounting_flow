@@ -45,6 +45,7 @@ export async function GET(req: Request) {
         i.created_at,
         i.voucher_number,
         i.voucher_amount,
+        i.voucher_date,
 
         d.sku,
         d.product_name,

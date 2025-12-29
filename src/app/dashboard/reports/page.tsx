@@ -142,6 +142,9 @@ export default function ReportesPage() {
         "Valor Devuelto": toCOP(f.total_valor_devuelto),
         "Número Comprobante": f.voucher_number,
         "Valor Comprobante": toCOP(f.voucher_amount),
+        "Fecha de Pago": f.voucher_date
+          ? new Date(f.voucher_date).toLocaleDateString("es-CO")
+          : "",
       }));
 
       exportToExcel(data, "Resumen de Recaudos", "UIAF");
@@ -208,6 +211,9 @@ export default function ReportesPage() {
         "Valor Devuelto": f.returned_value ?? 0,
         "Número Comprobante": f.voucher_number,
         "Valor Comprobante": f.voucher_amount,
+        "Fecha de Pago": f.voucher_date
+          ? new Date(f.voucher_date).toLocaleDateString("es-CO")
+          : "",
         "Método de Pago": f.payment_method,
         Estado: statusMap[f.status as keyof typeof statusMap] || f.status,
         "Causa Rechazo Factura":

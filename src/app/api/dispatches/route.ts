@@ -112,6 +112,9 @@ export async function GET() {
       voucherFileUrl: inv.voucher_file_url ?? null,
       voucherNumber: inv.voucher_number ?? null,
       voucherAmount: inv.voucher_amount ?? null,
+      voucherDate: inv.voucher_date
+        ? formatDateForFrontend(inv.voucher_date)
+        : null,
 
       rejection_cause_code: inv.rejection_cause_code ?? "",
       details: detailRows
@@ -200,12 +203,13 @@ export async function POST(request: Request) {
         voucher_file_url,
         voucher_number,
         voucher_amount,
+        voucher_date,
         notes,
         total_lines,
         total_units,
         created_at,
         updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
       `,
       [
         data.invoiceNumber,
@@ -233,6 +237,7 @@ export async function POST(request: Request) {
         data.voucherFileUrl,
         data.voucherNumber,
         data.voucherAmount,
+        toMySQLDate(data.voucherDate),
         data.notes,
         data.totalLines,
         data.totalUnits,
@@ -387,6 +392,7 @@ export async function PATCH(request: Request) {
         voucher_file_url = COALESCE(?, voucher_file_url),
         voucher_number = COALESCE(?, voucher_number),
         voucher_amount = COALESCE(?, voucher_amount),
+        voucher_date = COALESCE(?, voucher_date),
         status = COALESCE(?, status),
         rejection_cause_code = COALESCE(?, rejection_cause_code),
         updated_at = NOW()
@@ -396,6 +402,7 @@ export async function PATCH(request: Request) {
         data.voucherFileUrl,
         data.voucherNumber,
         data.voucherAmount,
+        toMySQLDate(data.voucherDate),
         data.status,
         data.rejection_cause_code ?? "",
         data.id,
@@ -528,11 +535,27 @@ export async function PATCH(request: Request) {
 
     await connection.commit();
 
+    // Obtener la factura actualizada para retornar voucherDate en dos formatos
+    const [updatedInvoiceRows] = await connection.execute<RowDataPacket[]>(
+      "SELECT voucher_date FROM invoices WHERE id = ?",
+      [data.id]
+    );
+    let voucherDate = null;
+    let voucherDateRaw = null;
+    if (updatedInvoiceRows.length > 0 && updatedInvoiceRows[0].voucher_date) {
+      // yyyy-MM-dd para el input tipo date
+      const d = new Date(updatedInvoiceRows[0].voucher_date);
+      voucherDateRaw = d.toISOString().slice(0, 10);
+      voucherDate = formatDateForFrontend(updatedInvoiceRows[0].voucher_date);
+    }
+
     console.log("Factura actualizada exitosamente");
 
     return NextResponse.json({
       message: "Factura legalizada correctamente",
       success: true,
+      voucherDate, // dd/MM/yyyy para mostrar
+      voucherDateRaw, // yyyy-MM-dd para el input tipo date
     });
   } catch (error: any) {
     if (connection) await connection.rollback();

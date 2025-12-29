@@ -383,6 +383,9 @@ export function FacturasDashboard({ initialInvoices }: FacturasDashboardProps) {
                 voucherFileUrl: "",
                 voucherNumber: row["VOUCHER_NUMBER"] || "",
                 voucherAmount: Number(row["VOUCHER_AMOUNT"] || 0),
+                voucherDate: row["VOUCHER_DATE"]
+                  ? parseExcelDate(row["VOUCHER_DATE"])
+                  : undefined, // Si no viene, enviar undefined
                 notes: row["NOTES"] || "",
                 totalLines: Number(row["TOTAL_LINES"] || 0),
                 totalUnits: Number(row["TOTAL_UNITS"] || 0),

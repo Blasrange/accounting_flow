@@ -44,6 +44,7 @@ export async function GET(req: Request) {
         i.created_at,
         i.voucher_number,
         i.voucher_amount,
+        i.voucher_date,
 
         COALESCE(SUM(d.weight), 0) AS total_weight,
         COALESCE(SUM(d.quantity), 0) AS total_units_despachadas,

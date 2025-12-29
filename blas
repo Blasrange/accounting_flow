@@ -36,6 +36,7 @@ CREATE TABLE invoices (
   voucher_file_url VARCHAR(255),
   voucher_number VARCHAR(100),
   voucher_amount DECIMAL(12,2),
+  voucher_date DATE,
   notes TEXT,
   total_lines INT NOT NULL,
   total_units INT NOT NULL,
